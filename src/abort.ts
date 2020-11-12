@@ -1,7 +1,7 @@
 import { TCheckPoint, AbortError, IAbortController, ITimeoutOptions, IPromiseCleanup } from './types'
 import { AbortController, AbortSignal } from 'abort-controller'
-import { exists } from './exists'
 import { isPromiseLike } from '.'
+import is from '@sindresorhus/is'
 
 export function bubbleAbort (signal?: AbortSignal | null): void {
   if (signal === undefined || signal === null) {
@@ -46,12 +46,12 @@ export function composeAbort (signal?: AbortSignal): IAbortController {
   const abort = (): void => {
     if (aborted) return
     aborted = true
-    if (exists(signal)) {
+    if (!is.nullOrUndefined(signal)) {
       signal.removeEventListener('abort', abort)
     }
     controller.abort()
   }
-  if (exists(signal)) {
+  if (!is.nullOrUndefined(signal)) {
     if (signal.aborted) {
       throw new AbortError()
     }
@@ -66,7 +66,7 @@ export function composeAbort (signal?: AbortSignal): IAbortController {
 export async function raceWithSignal <TReturn = unknown> (command: (signal: AbortSignal) => Iterable<Promise<TReturn>>, inputSignal?: AbortSignal): Promise<TReturn> {
   const { signal, abort } = composeAbort(inputSignal)
   const promises = Array.from(command(signal))
-  if (exists(inputSignal)) {
+  if (!is.nullOrUndefined(inputSignal)) {
     promises.push(new Promise((resolve, reject) => {
       const abortHandler = (): void => {
         clear()
@@ -116,7 +116,7 @@ export async function cleanupPromise <T> (
         return
       }
       const withCleanup = (cleanup: IPromiseCleanup): void => {
-        const hasSignal = exists(signal)
+        const hasSignal = !is.nullOrUndefined(signal)
         // @ts-expect-error 2532 - signal is certainly not undefined with hasSignal
         if (hasSignal && signal.aborted) {
           earlyFinish = earlyFinish ?? { error: new AbortError() }
@@ -131,7 +131,7 @@ export async function cleanupPromise <T> (
           }
           const close = (cleanupError?: Error): void => {
             const error = earlyFinish.error ?? cleanupError
-            if (exists(error)) {
+            if (!is.nullOrUndefined(error)) {
               return reject(error)
             }
             return resolve(earlyFinish.result)
@@ -164,7 +164,7 @@ export async function cleanupPromise <T> (
           }
           const close = (cleanupError?: Error): void => {
             const error = asyncError ?? cleanupError
-            if (exists(error)) {
+            if (!is.nullOrUndefined(error)) {
               return reject(error)
             }
             return resolve(result)
@@ -190,7 +190,7 @@ export async function cleanupPromise <T> (
 }
 
 export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>, { timeout, signal: inputSignal }: ITimeoutOptions = {}): Promise<T> {
-  if (!exists(timeout) || timeout === 0) {
+  if (is.nullOrUndefined(timeout) || timeout === 0) {
     bubbleAbort(inputSignal)
     return await command(inputSignal, noop)
   }

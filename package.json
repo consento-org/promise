@@ -1,5 +1,5 @@
 {
-  "name": "@consento/promise-utils",
+  "name": "@consento/promise",
   "version": "1.0.0",
   "private": true,
   "description": "Promise utilities used in Consento",
@@ -42,6 +42,7 @@
     "/src/types/"
   ],
   "dependencies": {
+    "@sindresorhus/is": "^4.0.0",
     "abort-controller": "^3.0.0",
     "buffer": "^5.7.0"
   },

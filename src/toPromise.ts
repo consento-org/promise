@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/return-await */
 import { isPromiseLike } from './isPromiseLike'
-import { isObject } from './isObject'
+import is from '@sindresorhus/is'
 
 const cache = new WeakMap<any, Promise<any>>()
 
@@ -17,7 +17,7 @@ export function toPromise<T> (input: T | PromiseLike<T>): Promise<T> {
     }
     return promise
   }
-  if (isObject(input)) {
+  if (is.object(input)) {
     let promise = cache.get(input)
     if (promise === undefined) {
       promise = Promise.resolve(input)
