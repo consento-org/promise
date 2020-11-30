@@ -1,16 +1,9 @@
-import { TCheckPoint, AbortError, IAbortController, ITimeoutOptions, IPromiseCleanup } from './types'
+import { TCheckPoint, IAbortController, ITimeoutOptions, IPromiseCleanup } from './types'
 import { AbortController, AbortSignal } from 'abort-controller'
 import { isPromiseLike } from '.'
 import is from '@sindresorhus/is'
-
-export function bubbleAbort (signal?: AbortSignal | null): void {
-  if (signal === undefined || signal === null) {
-    return
-  }
-  if (signal.aborted) {
-    throw new AbortError()
-  }
-}
+import { AbortError } from './AbortError'
+import { bubbleAbort } from './bubbleAbort'
 
 const cache = new WeakMap<AbortSignal, TCheckPoint>()
 const passthrough: TCheckPoint = <T> (input: T): T => input

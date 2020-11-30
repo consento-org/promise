@@ -1,4 +1,6 @@
 export * from './abort'
+export * from './AbortError'
+export * from './bubbleAbort'
 export * from './extPromise'
 export * from './isPromiseLike'
 export * from './toPromise'

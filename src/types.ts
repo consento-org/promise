@@ -7,13 +7,6 @@ export type IPromiseCleanup = () => void | PromiseLike<void>
 
 export type TCheckPoint = <T extends Promise<any>> (input: T) => T
 
-export class AbortError extends Error {
-  code = 'aborted'
-  constructor () {
-    super('aborted')
-  }
-}
-
 export interface IAbortController {
   signal: AbortSignal
   abort: () => void

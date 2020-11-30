@@ -1,5 +1,5 @@
 import { wrapTimeout, composeAbort, raceWithSignal, cleanupPromise } from '../abort'
-import { AbortError } from '../types'
+import { AbortError } from '../AbortError'
 import { AbortController, AbortSignal } from 'abort-controller'
 
 describe('composeAbort(signal?)', () => {
