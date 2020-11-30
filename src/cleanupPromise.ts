@@ -1,10 +1,12 @@
 import is from '@sindresorhus/is'
-import { IPromiseCleanup, ITimeoutOptions } from './types'
+import { ITimeoutOptions } from './types'
 import { AbortError } from './AbortError'
 import { wrapTimeout } from './wrapTimeout'
 import { isPromiseLike } from './isPromiseLike'
 
 const noop = (): void => {}
+
+export type PromiseCleanup = () => void | PromiseLike<void>
 
 export async function cleanupPromise <T> (
   command: (
@@ -12,7 +14,7 @@ export async function cleanupPromise <T> (
     reject: (error: Error) => void,
     signal: AbortSignal | null | undefined,
     resetTimeout: () => void
-  ) => (IPromiseCleanup | Promise<IPromiseCleanup>),
+  ) => (PromiseCleanup | Promise<PromiseCleanup>),
   opts: ITimeoutOptions = {}
 ): Promise<T> {
   const abortError = new AbortError()
@@ -37,7 +39,7 @@ export async function cleanupPromise <T> (
         reject(error)
         return
       }
-      const withCleanup = (cleanup: IPromiseCleanup): void => {
+      const withCleanup = (cleanup: PromiseCleanup): void => {
         const hasSignal = !is.nullOrUndefined(signal)
         // @ts-expect-error 2532 - signal is certainly not undefined with hasSignal
         if (hasSignal && signal.aborted) {
