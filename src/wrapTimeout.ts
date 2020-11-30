@@ -15,6 +15,8 @@ export class TimeoutError extends Error {
   }
 }
 
+export type TimeoutCommand <T> = (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>
+
 /**
  * Wraps an async operation and passes-in a signal that will be marked as
  * aborted when a given timeout set's in.
@@ -37,7 +39,7 @@ export class TimeoutError extends Error {
  * @param opts.timeout Optional timeout specification, 0 means that the timeout is ignored.
  * @param opts.signal Optional parent signal that can abort the the async function as well.
  */
-export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>, opts: TimeoutOptions = {}): Promise<T> {
+export async function wrapTimeout <T> (command: TimeoutCommand<T>, opts: TimeoutOptions = {}): Promise<T> {
   const { timeout, signal: inputSignal } = opts
   if (is.nullOrUndefined(timeout) || timeout === 0) {
     bubbleAbort(inputSignal)

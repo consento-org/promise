@@ -7,14 +7,15 @@ import { isPromiseLike } from './isPromiseLike'
 const noop = (): void => {}
 
 export type PromiseCleanup = () => void | PromiseLike<void>
+export type CleanupCommand<T> = (
+  resolve: (result: T) => void,
+  reject: (error: Error) => void,
+  signal: AbortSignal | null | undefined,
+  resetTimeout: () => void
+) => (PromiseCleanup | Promise<PromiseCleanup>)
 
 export async function cleanupPromise <T> (
-  command: (
-    resolve: (result: T) => void,
-    reject: (error: Error) => void,
-    signal: AbortSignal | null | undefined,
-    resetTimeout: () => void
-  ) => (PromiseCleanup | Promise<PromiseCleanup>),
+  command: CleanupCommand<T>,
   opts: TimeoutOptions = {}
 ): Promise<T> {
   const abortError = new AbortError()
