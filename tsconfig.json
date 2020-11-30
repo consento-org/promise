@@ -10,6 +10,7 @@
       "DOM"
     ],
     "strict": true,
+    "alwaysStrict": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
