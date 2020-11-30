@@ -1,5 +1,4 @@
 import { AbortSignal } from 'abort-controller'
-export { Buffer } from 'buffer'
 
 export { AbortSignal, AbortController } from 'abort-controller'
 
