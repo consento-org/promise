@@ -1,9 +1,9 @@
 import { AbortSignal } from 'abort-controller'
 
-export interface IAbortOptions {
+export interface AbortOptions {
   signal?: AbortSignal
 }
 
-export interface ITimeoutOptions extends IAbortOptions {
+export interface TimeoutOptions extends AbortOptions {
   timeout?: number
 }

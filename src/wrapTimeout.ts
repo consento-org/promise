@@ -1,4 +1,4 @@
-import { ITimeoutOptions } from './types'
+import { TimeoutOptions } from './options'
 import { AbortSignal } from 'abort-controller'
 import is from '@sindresorhus/is'
 import { bubbleAbort } from './bubbleAbort'
@@ -15,7 +15,7 @@ export class TimeoutError extends Error {
   }
 }
 
-export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>, { timeout, signal: inputSignal }: ITimeoutOptions = {}): Promise<T> {
+export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>, { timeout, signal: inputSignal }: TimeoutOptions = {}): Promise<T> {
   if (is.nullOrUndefined(timeout) || timeout === 0) {
     bubbleAbort(inputSignal)
     return await command(inputSignal, noop)

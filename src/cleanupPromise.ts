@@ -1,5 +1,5 @@
 import is from '@sindresorhus/is'
-import { ITimeoutOptions } from './types'
+import { TimeoutOptions } from './options'
 import { AbortError } from './AbortError'
 import { wrapTimeout } from './wrapTimeout'
 import { isPromiseLike } from './isPromiseLike'
@@ -15,7 +15,7 @@ export async function cleanupPromise <T> (
     signal: AbortSignal | null | undefined,
     resetTimeout: () => void
   ) => (PromiseCleanup | Promise<PromiseCleanup>),
-  opts: ITimeoutOptions = {}
+  opts: TimeoutOptions = {}
 ): Promise<T> {
   const abortError = new AbortError()
   return await wrapTimeout <T>(
