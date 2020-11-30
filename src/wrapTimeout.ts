@@ -15,7 +15,30 @@ export class TimeoutError extends Error {
   }
 }
 
-export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>, { timeout, signal: inputSignal }: TimeoutOptions = {}): Promise<T> {
+/**
+ * Wraps an async operation and passes-in a signal that will be marked as
+ * aborted when a given timeout set's in.
+ *
+ * Usage:
+ * ```javascript
+ * const { wrapTimeout } = require('@consento/promise/wrapTimeout')
+ *
+ * wrapTimeout(async (signal, resetTimeout) => {
+ *   if (signal) { // Signal may be undefined if timeout=0 is specified.
+ *     signal.addEventListener('abort', () => {
+ *       // now we should abort our work.
+ *     })
+ *   }
+ *   resetTimeout() // With reset-timeout you can reset a given input timeout, this may be useful to delay a timeout after user interaction.
+ * }, { timeout: 500 })
+ * ```
+ *
+ * @param command command to be executed; receives an AbortSignal if given or undefined and a function that can reset the timeout
+ * @param opts.timeout Optional timeout specification, 0 means that the timeout is ignored.
+ * @param opts.signal Optional parent signal that can abort the the async function as well.
+ */
+export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>, opts: TimeoutOptions = {}): Promise<T> {
+  const { timeout, signal: inputSignal } = opts
   if (is.nullOrUndefined(timeout) || timeout === 0) {
     bubbleAbort(inputSignal)
     return await command(inputSignal, noop)
