@@ -87,7 +87,7 @@ const noop = (): void => {}
 
 export async function cleanupPromise <T> (
   command: (
-    resolve: (result?: T) => void,
+    resolve: (result: T) => void,
     reject: (error: Error) => void,
     signal: AbortSignal | null | undefined,
     resetTimeout: () => void
@@ -98,16 +98,17 @@ export async function cleanupPromise <T> (
   return await wrapTimeout <T>(
     // eslint-disable-next-line @typescript-eslint/promise-function-async
     (signal, resetTimeout): Promise<T> => new Promise((resolve, reject) => {
-      let earlyFinish: { error?: Error | null, result?: T }
-      let process: (error: Error | null, result?: T) => void = (error, result) => {
+      type Finish = { error: Error } | { result: T }
+      let earlyFinish: Finish | undefined
+      let process = (finish: Finish): void => {
         process = noop
-        earlyFinish = { error, result }
+        earlyFinish = finish
       }
       let cleanupP
       try {
         cleanupP = command(
-          result => process(null, result),
-          error => process(error),
+          result => process({ result }),
+          error => process({ error }),
           signal,
           resetTimeout
         )
@@ -122,19 +123,22 @@ export async function cleanupPromise <T> (
           earlyFinish = earlyFinish ?? { error: new AbortError() }
         }
         if (earlyFinish !== undefined) {
+          const finish = earlyFinish
           let finalP
           try {
             finalP = cleanup()
           } catch (cleanupError) {
-            reject(earlyFinish.error ?? cleanupError)
+            reject('error' in finish ? finish.error : cleanupError)
             return
           }
           const close = (cleanupError?: Error): void => {
-            const error = earlyFinish.error ?? cleanupError
-            if (!is.nullOrUndefined(error)) {
-              return reject(error)
+            if ('error' in finish) {
+              return reject(finish.error)
             }
-            return resolve(earlyFinish.result)
+            if (!is.nullOrUndefined(cleanupError)) {
+              return reject(cleanupError)
+            }
+            return resolve(finish.result)
           }
           if (isPromiseLike(finalP)) {
             finalP.then(() => close(), close)
@@ -143,12 +147,12 @@ export async function cleanupPromise <T> (
           close()
           return
         }
-        const abort = (): void => process(abortError)
+        const abort = (): void => process({ error: abortError })
         if (hasSignal) {
           // @ts-expect-error 2532 - signal is certainly not undefined with hasSignal
           signal.addEventListener('abort', abort)
         }
-        process = (asyncError, result) => {
+        process = finish => {
           process = noop
           if (hasSignal) {
             // @ts-expect-error 2532 - signal is certainly not undefined with hasSignal
@@ -159,15 +163,17 @@ export async function cleanupPromise <T> (
           try {
             finalP = cleanup()
           } catch (cleanupError) {
-            reject(asyncError ?? cleanupError)
+            reject('error' in finish ? finish.error : cleanupError)
             return
           }
           const close = (cleanupError?: Error): void => {
-            const error = asyncError ?? cleanupError
-            if (!is.nullOrUndefined(error)) {
-              return reject(error)
+            if ('error' in finish) {
+              return reject(finish.error)
             }
-            return resolve(result)
+            if (!is.nullOrUndefined(cleanupError)) {
+              return reject(cleanupError)
+            }
+            return resolve(finish.result)
           }
           if (isPromiseLike(finalP)) {
             finalP.then(() => close(), close)
