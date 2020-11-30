@@ -14,6 +14,34 @@ export type CleanupCommand<T> = (
   resetTimeout: () => void
 ) => (PromiseCleanup | Promise<PromiseCleanup>)
 
+/**
+ * Versatile custom Promise implementation that allows to execute an async
+ * cleanup operation after a promise is resolved or rejected.
+ *
+ * Usage:
+ *
+ * ```javascript
+ * import { cleanupPromise } = require('@consento/promise/cleanupPromise')
+ *
+ * const result = await cleanupPromise((resolve, reject, signal) => {
+ *   setTimeout(resolve, Math.random() * 500) // Resolve & reject work like in regular promises
+ *   setTimeout(reject, Math.random() * 500)
+ *   const abortHandler = () => {
+ *     reject(new Error('aborted'))
+ *   }
+ *   signal.addEventListener('abort', abortHandler)
+ *   return () => {
+ *     // Executed after resolve or reject is called.
+ *     signal.removeEventListener('abort, abortHandler)
+ *   }
+ * })
+ *
+ * cleanupPromise(..., { timeout: 500, signal }) // You can also pass-in a parent signal or a timeout!
+ * ```
+ *
+ * @param command Async command that will be executed with additional signal
+ * @see wrapTimeout for the timeout details
+ */
 export async function cleanupPromise <T> (
   command: CleanupCommand<T>,
   opts: TimeoutOptions = {}
