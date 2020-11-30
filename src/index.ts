@@ -1,6 +1,7 @@
 export * from './abort'
 export * from './checkpoint'
 export * from './composeAbort'
+export * from './cleanupPromise'
 export * from './AbortError'
 export * from './bubbleAbort'
 export * from './extPromise'
