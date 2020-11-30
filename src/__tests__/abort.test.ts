@@ -1,57 +1,6 @@
-import { wrapTimeout, composeAbort, raceWithSignal, cleanupPromise } from '../abort'
+import { wrapTimeout, cleanupPromise } from '../abort'
 import { AbortError } from '../AbortError'
 import { AbortController, AbortSignal } from 'abort-controller'
-
-describe('composeAbort(signal?)', () => {
-  it('composing abort without signal', async () => {
-    const { signal, abort } = composeAbort()
-    expect(signal).toBeDefined()
-    expect(abort).toBeInstanceOf(Function)
-    let abortCalled = 0
-    signal.addEventListener('abort', () => {
-      abortCalled++
-    })
-    abort()
-    expect(abortCalled).toBe(1)
-  })
-  it('composing with signal: abort causes parent to not abort', async () => {
-    const { signal: parentSignal } = new AbortController()
-    const { signal, abort } = composeAbort(parentSignal)
-    let parentCalled = 0
-    parentSignal.addEventListener('abort', () => {
-      parentCalled++
-    })
-    let abortCalled = 0
-    signal.addEventListener('abort', () => {
-      abortCalled++
-    })
-    abort()
-    expect(parentCalled).toBe(0)
-    expect(abortCalled).toBe(1)
-  })
-  it('composing with signal: abort of parent causes child abort', async () => {
-    const parent = new AbortController()
-    const { signal } = composeAbort(parent.signal)
-    let parentCalled = 0
-    parent.signal.addEventListener('abort', () => {
-      parentCalled++
-    })
-    let abortCalled = 0
-    signal.addEventListener('abort', () => {
-      abortCalled++
-    })
-    parent.abort()
-    expect(parentCalled).toBe(1)
-    expect(abortCalled).toBe(1)
-  })
-  it('composing an aborted signal causes an exception', async () => {
-    const parent = new AbortController()
-    parent.abort()
-    expect(() => {
-      composeAbort(parent.signal)
-    }).toThrowError(AbortError)
-  })
-})
 
 describe('wrapTimeout(template, { timeout, signal })', () => {
   it('wrapping without timeout is a simple passthrough', async () => {
@@ -161,63 +110,6 @@ describe('wrapTimeout(template, { timeout, signal })', () => {
       return 'hello'
     }, { timeout: 7 })
     expect(result).toBe('hello')
-  })
-})
-
-describe('raceWithSignal(template, signal?)', () => {
-  it('will always have signal', async () => {
-    const result = await raceWithSignal(signal => [
-      (async () => {
-        expect(signal).toBeDefined()
-        return 'hello'
-      })()
-    ])
-    expect(result).toBe('hello')
-  })
-  it('will call abort on result', async () => {
-    let abortCalled = false
-    let finished = false
-    const result = raceWithSignal(signal => [
-      new Promise((resolve) => {
-        finished = true
-        resolve('hi')
-      }),
-      new Promise((resolve, reject) => {
-        signal.addEventListener('abort', () => {
-          abortCalled = true
-          reject(new AbortError())
-        })
-      })
-    ])
-    expect(abortCalled).toBe(false)
-    expect(finished).toBe(true)
-    expect(await result).toBe('hi')
-    expect(abortCalled).toBe(true)
-  })
-  it('will cancel all races if the input signal is cancelled', async () => {
-    const controller = new AbortController()
-    let abortCalled = false
-    const p = expect(
-      raceWithSignal(signal => [
-        new Promise((resolve, reject) => {
-          signal.addEventListener('abort', () => {
-            abortCalled = true
-          })
-        })
-      ], controller.signal)
-    ).rejects.toBeInstanceOf(AbortError)
-    controller.abort()
-    await p
-    expect(abortCalled).toBe(true)
-  })
-  it('aborted signal causes immediate rejection', async () => {
-    const controller = new AbortController()
-    controller.abort()
-    await expect(
-      raceWithSignal(() => {
-        fail('wrapper called')
-      }, controller.signal)
-    ).rejects.toBeInstanceOf(AbortError)
   })
 })
 
