@@ -1,32 +1,10 @@
-import { IAbortController, ITimeoutOptions, IPromiseCleanup } from './types'
-import { AbortController, AbortSignal } from 'abort-controller'
+import { ITimeoutOptions, IPromiseCleanup } from './types'
+import { AbortSignal } from 'abort-controller'
 import { isPromiseLike } from '.'
 import is from '@sindresorhus/is'
 import { AbortError } from './AbortError'
 import { bubbleAbort } from './bubbleAbort'
-
-export function composeAbort (signal?: AbortSignal): IAbortController {
-  const controller = new AbortController()
-  let aborted = false
-  const abort = (): void => {
-    if (aborted) return
-    aborted = true
-    if (!is.nullOrUndefined(signal)) {
-      signal.removeEventListener('abort', abort)
-    }
-    controller.abort()
-  }
-  if (!is.nullOrUndefined(signal)) {
-    if (signal.aborted) {
-      throw new AbortError()
-    }
-    signal.addEventListener('abort', abort)
-  }
-  return {
-    signal: controller.signal,
-    abort
-  }
-}
+import { composeAbort } from './composeAbort'
 
 export async function raceWithSignal <TReturn = unknown> (command: (signal: AbortSignal) => Iterable<Promise<TReturn>>, inputSignal?: AbortSignal): Promise<TReturn> {
   const { signal, abort } = composeAbort(inputSignal)
