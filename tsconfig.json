@@ -16,7 +16,6 @@
     "outDir": "dist",
     "baseUrl": ".",
     "skipLibCheck": true,
-    "types": ["jest"],
     "declaration": true,
     "paths": {
       "*": [
