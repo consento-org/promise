@@ -1,7 +1,5 @@
 import { AbortSignal } from 'abort-controller'
 
-export { AbortSignal, AbortController } from 'abort-controller'
-
 export interface IAbortOptions {
   signal?: AbortSignal
 }
