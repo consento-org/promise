@@ -5,11 +5,6 @@ export { AbortSignal, AbortController } from 'abort-controller'
 
 export type IPromiseCleanup = () => void | PromiseLike<void>
 
-export interface IAbortController {
-  signal: AbortSignal
-  abort: () => void
-}
-
 export interface IAbortOptions {
   signal?: AbortSignal
 }

@@ -1,9 +1,12 @@
 import is from '@sindresorhus/is'
-import { AbortController } from 'abort-controller'
+import { AbortController, AbortSignal } from 'abort-controller'
 import { AbortError } from './AbortError'
-import { IAbortController } from './types'
 
-export function composeAbort (signal?: AbortSignal): IAbortController {
+export interface AbortControllerLike {
+  signal: AbortSignal
+  abort: () => void
+}
+export function composeAbort (signal?: AbortSignal): AbortControllerLike {
   const controller = new AbortController()
   let aborted = false
   const abort = (): void => {
