@@ -195,6 +195,15 @@ export async function cleanupPromise <T> (
   )
 }
 
+export class TimeoutError extends Error {
+  timeout: number
+  code = 'timeout'
+  constructor (timeout: number) {
+    super(`Timeout [t=${timeout}]`)
+    this.timeout = timeout
+  }
+}
+
 export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>, { timeout, signal: inputSignal }: ITimeoutOptions = {}): Promise<T> {
   if (is.nullOrUndefined(timeout) || timeout === 0) {
     bubbleAbort(inputSignal)
@@ -213,7 +222,7 @@ export async function wrapTimeout <T> (command: (signal: AbortSignal | undefined
           clearTimeout(timer)
         }
         timer = setTimeout(() => {
-          reject(Object.assign(new Error(`Timeout [t=${timeout}]`), { code: 'timeout', timeout }))
+          reject(new TimeoutError(timeout))
           clear()
         }, timeout)
       }
