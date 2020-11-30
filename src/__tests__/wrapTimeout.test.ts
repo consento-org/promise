@@ -1,4 +1,4 @@
-import { wrapTimeout } from '../abort'
+import { wrapTimeout } from '../wrapTimeout'
 import { AbortError } from '../AbortError'
 import { AbortController, AbortSignal } from 'abort-controller'
 

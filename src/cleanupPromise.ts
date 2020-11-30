@@ -1,7 +1,7 @@
 import is from '@sindresorhus/is'
 import { IPromiseCleanup, ITimeoutOptions } from './types'
 import { AbortError } from './AbortError'
-import { wrapTimeout } from './abort'
+import { wrapTimeout } from './wrapTimeout'
 import { isPromiseLike } from './isPromiseLike'
 
 const noop = (): void => {}
