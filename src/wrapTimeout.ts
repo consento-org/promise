@@ -15,6 +15,10 @@ export class TimeoutError extends Error {
   }
 }
 
+/**
+ * @param signal Optional signal that triggers abort
+ * @param resetTimeout Util that allows to reset a timeout for certain condition, use with care
+ */
 export type TimeoutCommand <T> = (signal: AbortSignal | undefined, resetTimeout: () => void) => Promise<T>
 
 /**
