@@ -1,4 +1,5 @@
 export * from './abort'
+export * from './checkpoint'
 export * from './AbortError'
 export * from './bubbleAbort'
 export * from './extPromise'
