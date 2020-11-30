@@ -6,6 +6,28 @@ export interface AbortControllerLike {
   signal: AbortSignal
   abort: () => void
 }
+
+/**
+ * Creates a new AbortController-compatible instance
+ * that can be aborted both with the `abort` operation and
+ * a passed-in signal.
+ *
+ * Usage:
+ * ```javascript
+ * const { composeAbort } = require('@consento/promise/composeAbort')
+ * const { AbortController } = require('abort-controller')
+ *
+ * const main = new AbortController()
+ * const composed = composeAbort(main.signal)
+ *
+ * main.abort() // Will both abort main and composed
+ * composed.abort() // Will abort only the composed
+ *
+ * const other = composeAbort(null) // The signal is optional, allows for flexibility of an abortsignal.
+ * ```
+ *
+ * @param signal Optional Signal that can abort the controller
+ */
 export function composeAbort (signal?: AbortSignal): AbortControllerLike {
   const controller = new AbortController()
   let aborted = false
