@@ -28,7 +28,7 @@ in this repo!
 
 - [`bubbleAbort()`](#bubble-abort) - tiny helper for dealing with abort signals
 - [`checkpoint()`](#checkpoint) - comfortable helper for dealing with abort signals
-- [`cbPromise()`](#cb-promise) - tiny helper for asynchronous code
+- [`cbPromise()`](#cb-promise) - tiny helper for asynchronous code using callbacks and promises
 - [`cleanupPromise()`](#cleanup-promise) - versatile promise variant that allows react-style hook cleanups
 - [`composeAbort()`](#compose-abort) - compose an abort-signal into sub-variants.
 - [`isPromiseLike()`](#is-promise-like) - typescript type-check helper
