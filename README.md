@@ -32,7 +32,6 @@ in this repo!
 - [`composeAbort()`](#compose-abort) - compose an abort-signal into sub-variants.
 - [`isPromiseLike()`](#is-promise-like) - typescript type-check helper
 - [`raceWithSignal()`](#race-with-signal) - races several promises, all but the first will be aborted
-- [`toPromise()`](#to-promise) - turns a value into a promise, cleverly
 - [`wrapTimeout()`](#wrap-timeout) - wraps an async function to have an optional timeout
 
 #### `bubbleAbort()`
@@ -125,31 +124,6 @@ await raceWithSignal(signal => {
 })
 
 await raceWithSignal(..., inputSignal) // You can also pass-in a signal that you maintain.
-```
-
-#### `toPromise()`
-
-For when you need to make sure that you have a promise at hand.
-
-Turns any given js object into a Promise. It will also cache the
-Promises to save memory and instantiation time.
-
-There are several legacy promise implementations that are similar
-but different from the `Promise` javascript standard, this method
-will turn those promises into actual Promises.
-
-_Usage:_
-
-```javascript
-const { toPromise } = require('@consento/promise/toPromise')
-
-toPromise(1) // Promise<1>
-toPromise(Promise.resolve(1)) // same promise as input
-toPromise({ then: (resolve, reject) => { ... } }) // returns a standard Promise
-
-const obj = { hello: 'world' }
-toPromise(obj) // Returns a promise for `obj`
-toPromise(obj) // Returns exactly the same promise as the previous call.
 ```
 
 #### `wrapTimeout()`
