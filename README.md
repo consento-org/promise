@@ -34,7 +34,7 @@ in this repo!
 - [`raceWithSignal()`](#race-with-signal) - races several promises, all but the first will be aborted
 - [`wrapTimeout()`](#wrap-timeout) - wraps an async function to have an optional timeout
 
-#### `bubbleAbort()`
+#### `bubbleAbort([signal: AbortSignal]): void`
 
 Simple function that throws an AbortError if an AbortSignal
 happens to be aborted.
@@ -54,7 +54,7 @@ async function longRunning ({ signal } = {}) {
 }
 ```
 
-#### `checkpoint()`
+#### `checkpoint([signal: AbortSignal]): ([input: any]) => input`
 
 Allows the creation of a checkpoint function that aborts
 an async script if a signal is aborted.
@@ -77,7 +77,7 @@ async function longRunning ({ signal }: {}) {
 }
 ```
 
-#### `cleanupPromise()`
+#### `cleanupPromise((resolve<T>, reject, signal, resetTimeout) => () => void, [{ timeout?: number, signal?: AbortSignal}]): Promise<T>`
 
 Versatile custom Promise implementation that allows to execute an async
 cleanup operation after a promise is resolved or rejected.
@@ -106,7 +106,7 @@ const result = await cleanupPromise((resolve, reject, signal) => {
 cleanupPromise(..., { timeout: 500, signal }) // You can also pass-in a parent signal or a timeout!
 ```
 
-#### `isPromiseLike()`
+#### `isPromiseLike(input): input is PromiseLike`
 
 TypeScript util that helps to identify if a promise is a [`PromiseLike`][PromiseLike] instance.
 
@@ -126,7 +126,7 @@ async function foo (input: any) {
 }
 ```
 
-#### `raceWithSignal()`
+#### `raceWithSignal((signal: AbortSignal) => Promise<T>[], [signal: AbortSignal]): Promise<T>`
 
 Similar to `Promise.race` but aborts all promises that don't win the race.
 
@@ -146,7 +146,7 @@ await raceWithSignal(signal => {
 await raceWithSignal(..., inputSignal) // You can also pass-in a signal that you maintain.
 ```
 
-#### `wrapTimeout()`
+#### `wrapTimeout((signal?: AbortSignal, resetTimeout: () => void) => Promise<T>, [{ timeout?: number, signal?: AbortSignal}]): Promise<T>`
 
 Wraps an async operation and passes-in a signal that will be marked as aborted when a given timeout set's in.
 
