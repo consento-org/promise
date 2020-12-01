@@ -93,7 +93,7 @@ const result = await cleanupPromise((resolve, reject, signal) => {
   signal.addEventListener('abort', abortHandler)
   return () => {
     // Executed after resolve or reject is called.
-    signal.removeEventListener('abort, abortHandler)
+    signal.removeEventListener('abort', abortHandler)
   }
 })
 
