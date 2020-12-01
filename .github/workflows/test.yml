@@ -3,10 +3,12 @@ name: Build Status
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
+  schedule:
+    - cron: "0 0 1 * *"
 jobs:
   build:
     strategy:
