@@ -28,7 +28,6 @@ in this repo!
 
 - [`bubbleAbort()`](#bubble-abort) - tiny helper for dealing with abort signals
 - [`checkpoint()`](#checkpoint) - comfortable helper for dealing with abort signals
-- [`cbPromise()`](#cb-promise) - tiny helper for asynchronous code using callbacks and promises
 - [`cleanupPromise()`](#cleanup-promise) - versatile promise variant that allows react-style hook cleanups
 - [`composeAbort()`](#compose-abort) - compose an abort-signal into sub-variants.
 - [`isPromiseLike()`](#is-promise-like) - typescript type-check helper
@@ -53,31 +52,6 @@ async function longRunning ({ signal } = {}) {
     result += data
   }
   return result
-}
-```
-
-#### `cbPromise()`
-
-Extended Promise that has the `resolve` and `reject` methods
-on the class instance instead of a template function.
-
-```javascript
-const { CBPromise } = require('@consento/promise/cbPromise')
-
-const p = new CBPromise()
-p.cb(new Error(), 'result') // traditional callback API
-p.resolve('result') // or use traditional resolve
-p.reject(new Error()) // and reject
-```
-
-This may come in handy when you need a callback but want to await
-the promise.
-
-```javascript
-async function test () {
-  const p = new CBPromise()
-  setTimeout(p.resolve, 500)
-  await p
 }
 ```
 
