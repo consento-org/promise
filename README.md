@@ -93,7 +93,10 @@ const result = await cleanupPromise((resolve, reject, signal) => {
   const abortHandler = () => {
     reject(new Error('aborted'))
   }
-  signal.addEventListener('abort', abortHandler)
+  if (signal) {
+    // If no signal is necessary, the signal will not be provided.
+    signal.addEventListener('abort', abortHandler)
+  }
   return () => {
     // Executed after resolve or reject is called.
     signal.removeEventListener('abort', abortHandler)
