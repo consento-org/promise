@@ -112,6 +112,20 @@ TypeScript util that helps to identify if a promise is a [`PromiseLike`][Promise
 
 [PromiseLike]: https://github.com/microsoft/TypeScript/blob/1bd8e388aeda1df0f1dbc2a1a0ef9361a0d43d6f/src/lib/es5.d.ts#L1401-L1409
 
+_Usage:_
+
+```typescript
+import { isPromiseLike } from '@consento/promise/isPromiseLike'
+
+async function foo (input: any) {
+  if (isPromiseLike(input)) {
+    // do something async
+  } else {
+    // just sync away
+  }
+}
+```
+
 #### `raceWithSignal()`
 
 Similar to `Promise.race` but aborts all promises that don't win the race.

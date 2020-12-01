@@ -1,6 +1,19 @@
 /**
  * TypeScript util that helps to identify if a promise is a `PromiseLike` instance.
  *
+ * Usage:
+ *
+ * ```typescript
+ * import { isPromiseLike } from '@consento/promise/isPromiseLike'
+ *
+ * async function foo (input: any) {
+ *   if (isPromiseLike(input)) {
+ *     // do something async
+ *   } else {
+ *     // just sync away
+ *   }
+ * }
+ * ```
  * @param arg an object that may be a promise
  * @see https://github.com/microsoft/TypeScript/blob/1bd8e388aeda1df0f1dbc2a1a0ef9361a0d43d6f/src/lib/es5.d.ts#L1401-L1409
  */
