@@ -10,13 +10,13 @@
       "DOM"
     ],
     "strict": true,
+    "alwaysStrict": true,
     "noImplicitAny": true,
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "dist",
     "baseUrl": ".",
     "skipLibCheck": true,
-    "types": ["jest"],
     "declaration": true,
     "paths": {
       "*": [
