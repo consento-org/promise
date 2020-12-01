@@ -106,6 +106,27 @@ const result = await cleanupPromise((resolve, reject, signal) => {
 cleanupPromise(..., { timeout: 500, signal }) // You can also pass-in a parent signal or a timeout!
 ```
 
+#### `composeAbort([signal: Signal]): { abort: () => void, signal: AbortSignal }`
+
+Creates a new AbortController-compatible instance
+that can be aborted both with the `abort` operation and
+a passed-in signal.
+
+_Usage:_
+
+```javascript
+const { composeAbort } = require('@consento/promise/composeAbort')
+const { AbortController } = require('abort-controller')
+
+const main = new AbortController()
+const composed = composeAbort(main.signal)
+
+main.abort() // Will both abort main and composed
+composed.abort() // Will abort only the composed
+
+const other = composeAbort(null) // The signal is optional, allows for flexibility of an abortsignal.
+```
+
 #### `isPromiseLike(input): input is PromiseLike`
 
 TypeScript util that helps to identify if a promise is a [`PromiseLike`][PromiseLike] instance.
