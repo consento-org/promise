@@ -68,7 +68,10 @@ async function longRunning ({ signal }: {}) {
   const cp = checkpoint(signal)
   let result
   for (const data of internalIterator()) {
-    result += await cp(data) // An AbortError will be thrown if the passed-in signal happens to be aborted.
+    result += cp(data) // An AbortError will be thrown if the passed-in signal happens to be aborted.
+    cp() // You don't need to pass in data, you can also use it as-is
+    const foo = await cp(Promise.resolve('bar')) // the return type is equal to the input type,
+                                                 // if a promise, you need to await it.
   }
   return result
 }

@@ -1,10 +1,12 @@
 import { AbortError } from './AbortError'
-import { isPromiseLike } from './isPromiseLike'
 
 const cache = new WeakMap<AbortSignal, CheckPoint>()
-const passthrough: CheckPoint = <T> (input: T): T => input
+const passthrough: CheckPoint = <T> (input?: T): T | undefined => input
 
-export type CheckPoint = <T extends Promise<any>> (input: T) => T
+export interface CheckPoint {
+  (): void
+  <T> (input: T): T
+}
 
 /**
  * Allows the creation of a checkpoint function that aborts
@@ -19,7 +21,10 @@ export type CheckPoint = <T extends Promise<any>> (input: T) => T
  *   const cp = checkpoint(signal)
  *   let result
  *   for (const data of internalIterator()) {
- *     result += await cp(data) // An AbortError will be thrown if the passed-in signal happens to be aborted.
+ *     result += cp(data) // An AbortError will be thrown if the passed-in signal happens to be aborted.
+ *     cp() // You don't need to pass in data, you can also use it as-is
+ *     const foo = await cp(Promise.resolve('bar')) // the return type is equal to the input type,
+ *                                                  // if a promise, you need to await it.
  *   }
  *   return result
  * }
@@ -36,15 +41,7 @@ export function checkpoint (signal?: AbortSignal): CheckPoint {
   }
   let cp = cache.get(signal)
   if (cp === undefined) {
-    cp = <T> (input: T): T => {
-      if (isPromiseLike(input)) {
-        return input.then(data => {
-          if (signal.aborted) {
-            throw new AbortError()
-          }
-          return data
-        }) as unknown as T
-      }
+    cp = <T> (input?: T): T | undefined => {
       if (signal.aborted) {
         throw new AbortError()
       }
