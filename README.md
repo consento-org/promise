@@ -26,13 +26,13 @@ in this repo!
 
 ## Utils
 
-- [`bubbleAbort()`](#bubble-abort) - tiny helper for dealing with abort signals
-- [`checkpoint()`](#checkpoint) - comfortable helper for dealing with abort signals
-- [`cleanupPromise()`](#cleanup-promise) - versatile promise variant that allows react-style hook cleanups
-- [`composeAbort()`](#compose-abort) - compose an abort-signal into sub-variants.
-- [`isPromiseLike()`](#is-promise-like) - typescript type-check helper
-- [`raceWithSignal()`](#race-with-signal) - races several promises, all but the first will be aborted
-- [`wrapTimeout()`](#wrap-timeout) - wraps an async function to have an optional timeout
+- [`bubbleAbort()`](#bubbleabortsignal-abortsignal-void) - tiny helper for dealing with abort signals
+- [`checkpoint()`](#checkpointsignal-abortsignal-input-any--input) - comfortable helper for dealing with abort signals
+- [`cleanupPromise()`](#cleanuppromiseresolvet-reject-signal-resettimeout----void--timeout-number-signal-abortsignal-promiset) - versatile promise variant that allows react-style hook cleanups
+- [`composeAbort()`](#composeabortsignal-signal--abort---void-signal-abortsignal-) - compose an abort-signal into sub-variants.
+- [`isPromiseLike()`](#ispromiselikeinput-input-is-promiselike) - typescript type-check helper
+- [`raceWithSignal()`](#racewithsignalsignal-abortsignal--promiset-signal-abortsignal-promiset) - races several promises, all but the first will be aborted
+- [`wrapTimeout()`](#wraptimeoutsignal-abortsignal-resettimeout---void--promiset--timeout-number-signal-abortsignal-promiset) - wraps an async function to have an optional timeout
 
 #### `bubbleAbort([signal: AbortSignal]): void`
 
