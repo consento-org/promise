@@ -54,7 +54,7 @@ async function longRunning ({ signal } = {}) {
 }
 ```
 
-#### `checkpoint([signal: AbortSignal]): ([input: any]) => input`
+#### `checkpoint([signal: AbortSignal]): ([input: () => T]) => T`
 
 Allows the creation of a checkpoint function that aborts
 an async script if a signal is aborted.
@@ -68,10 +68,12 @@ async function longRunning ({ signal }: {}) {
   const cp = checkpoint(signal)
   let result
   for (const data of internalIterator()) {
-    result += cp(data) // An AbortError will be thrown if the passed-in signal happens to be aborted.
-    cp() // You don't need to pass in data, you can also use it as-is
-    const foo = await cp(Promise.resolve('bar')) // the return type is equal to the input type,
-                                                 // if a promise, you need to await it.
+    cp() // you can use the checkpoint as-is
+    result += data
+
+    // passing-in a template function is going to execute that
+    // template function only it the signal is not aborted.
+    const foo = await cp(async () => 'bar')
   }
   return result
 }

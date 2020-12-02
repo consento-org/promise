@@ -1,11 +1,15 @@
 import { AbortError } from './AbortError'
 
 const cache = new WeakMap<AbortSignal, CheckPoint>()
-const passthrough: CheckPoint = <T> (input?: T): T | undefined => input
+const passthrough: CheckPoint = <T> (input?: () => T): T | undefined => {
+  if (typeof input === 'function') {
+    return input()
+  }
+}
 
 export interface CheckPoint {
   (): void
-  <T> (input: T): T
+  <T> (input: () => T): T
 }
 
 /**
@@ -21,10 +25,12 @@ export interface CheckPoint {
  *   const cp = checkpoint(signal)
  *   let result
  *   for (const data of internalIterator()) {
- *     result += cp(data) // An AbortError will be thrown if the passed-in signal happens to be aborted.
- *     cp() // You don't need to pass in data, you can also use it as-is
- *     const foo = await cp(Promise.resolve('bar')) // the return type is equal to the input type,
- *                                                  // if a promise, you need to await it.
+ *     cp() // you can use the checkpoint as-is
+ *     result += data
+ *
+ *     // passing-in a template function is going to execute that
+ *     // template function only it the signal is not aborted.
+ *     const foo = await cp(async () => 'bar')
  *   }
  *   return result
  * }
@@ -39,13 +45,18 @@ export function checkpoint (signal?: AbortSignal): CheckPoint {
   if (signal === undefined || signal === null) {
     return passthrough
   }
+  if (signal.aborted) {
+    throw new AbortError()
+  }
   let cp = cache.get(signal)
   if (cp === undefined) {
-    cp = <T> (input?: T): T | undefined => {
+    cp = <T> (input?: () => T): T | undefined => {
       if (signal.aborted) {
         throw new AbortError()
       }
-      return input
+      if (typeof input === 'function') {
+        return input()
+      }
     }
     cache.set(signal, cp)
   }
