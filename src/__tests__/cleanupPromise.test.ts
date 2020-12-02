@@ -283,4 +283,10 @@ describe('cleanupPromise(template, { timeout, signal }', () => {
       }
     )).rejects.toBe(error)
   })
+  it('missing cleanup is not a problem', async () => {
+    const result = await cleanupPromise(resolve => {
+      setTimeout(resolve, 10, 'hi')
+    })
+    expect(result).toBe('hi')
+  })
 })

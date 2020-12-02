@@ -95,17 +95,17 @@ const result = await cleanupPromise((resolve, reject, signal) => {
   const abortHandler = () => {
     reject(new Error('aborted'))
   }
-  if (signal) {
-    // If no signal is necessary, the signal will not be provided.
-    signal.addEventListener('abort', abortHandler)
-  }
+  // If no signal is necessary, the signal will not be provided.
+  signal?.addEventListener('abort', abortHandler)
   return () => {
     // Executed after resolve or reject is called.
-    signal.removeEventListener('abort', abortHandler)
+    signal?.removeEventListener('abort', abortHandler)
   }
 })
 
 cleanupPromise(..., { timeout: 500, signal }) // You can also pass-in a parent signal or a timeout!
+
+cleanupPromise((resolve, reject): void => {}) // You can also use it like a regular promise
 ```
 
 #### `composeAbort([signal: Signal]): { abort: () => void, signal: AbortSignal }`

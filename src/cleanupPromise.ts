@@ -8,11 +8,20 @@ const noop = (): void => {}
 
 export type PromiseCleanup = () => void | PromiseLike<void>
 export type CleanupCommand<T> = (
-  resolve: (result: T) => void,
-  reject: (error: Error) => void,
-  signal: AbortSignal | null | undefined,
-  resetTimeout: () => void
-) => (PromiseCleanup | Promise<PromiseCleanup>)
+  (
+    resolve: (result: T) => void,
+    reject: (error: Error) => void,
+    signal: AbortSignal | null | undefined,
+    resetTimeout: () => void
+  ) => (PromiseCleanup | Promise<PromiseCleanup>)
+) | (
+  (
+    resolve: (result: T) => void,
+    reject: (error: Error) => void,
+    signal: AbortSignal | null | undefined,
+    resetTimeout: () => void
+  ) => void
+)
 
 /**
  * Versatile custom Promise implementation that allows to execute an async
@@ -29,23 +38,23 @@ export type CleanupCommand<T> = (
  *   const abortHandler = () => {
  *     reject(new Error('aborted'))
  *   }
- *  if (signal) {
- *    // If no signal is necessary, the signal will not be provided.
- *    signal.addEventListener('abort', abortHandler)
- *  }
+ *   // If no signal is necessary, the signal will not be provided.
+ *   signal?.addEventListener('abort', abortHandler)
  *   return () => {
  *     // Executed after resolve or reject is called.
- *     signal.removeEventListener('abort', abortHandler)
+ *     signal?.removeEventListener('abort', abortHandler)
  *   }
  * })
  *
  * cleanupPromise(..., { timeout: 500, signal }) // You can also pass-in a parent signal or a timeout!
+ *
+ * cleanupPromise((resolve, reject): void => {}) // You can also use it like a regular promise
  * ```
  *
  * @param command Async command that will be executed with additional signal
  * @see wrapTimeout for the timeout details
  */
-export async function cleanupPromise <T> (
+export async function cleanupPromise <T = unknown> (
   command: CleanupCommand<T>,
   opts: TimeoutOptions = {}
 ): Promise<T> {
@@ -71,7 +80,7 @@ export async function cleanupPromise <T> (
         reject(error)
         return
       }
-      const withCleanup = (cleanup: PromiseCleanup): void => {
+      const withCleanup = (cleanup: any): void => {
         const hasSignal = !is.nullOrUndefined(signal)
         // @ts-expect-error 2532 - signal is certainly not undefined with hasSignal
         if (hasSignal && signal.aborted) {
@@ -79,13 +88,6 @@ export async function cleanupPromise <T> (
         }
         if (earlyFinish !== undefined) {
           const finish = earlyFinish
-          let finalP
-          try {
-            finalP = cleanup()
-          } catch (cleanupError) {
-            reject('error' in finish ? finish.error : cleanupError)
-            return
-          }
           const close = (cleanupError?: Error): void => {
             if ('error' in finish) {
               return reject(finish.error)
@@ -94,6 +96,17 @@ export async function cleanupPromise <T> (
               return reject(cleanupError)
             }
             return resolve(finish.result)
+          }
+          if (typeof cleanup !== 'function') {
+            close()
+            return
+          }
+          let finalP
+          try {
+            finalP = cleanup()
+          } catch (cleanupError) {
+            reject('error' in finish ? finish.error : cleanupError)
+            return
           }
           if (isPromiseLike(finalP)) {
             finalP.then(() => close(), close)
@@ -113,14 +126,6 @@ export async function cleanupPromise <T> (
             // @ts-expect-error 2532 - signal is certainly not undefined with hasSignal
             signal.removeEventListener('abort', abort)
           }
-
-          let finalP
-          try {
-            finalP = cleanup()
-          } catch (cleanupError) {
-            reject('error' in finish ? finish.error : cleanupError)
-            return
-          }
           const close = (cleanupError?: Error): void => {
             if ('error' in finish) {
               return reject(finish.error)
@@ -129,6 +134,17 @@ export async function cleanupPromise <T> (
               return reject(cleanupError)
             }
             return resolve(finish.result)
+          }
+          if (typeof cleanup !== 'function') {
+            close()
+            return
+          }
+          let finalP
+          try {
+            finalP = cleanup()
+          } catch (cleanupError) {
+            reject('error' in finish ? finish.error : cleanupError)
+            return
           }
           if (isPromiseLike(finalP)) {
             finalP.then(() => close(), close)
