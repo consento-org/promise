@@ -34,9 +34,7 @@ export function composeAbort (signal?: AbortSignal): AbortControllerLike {
   const abort = (): void => {
     if (aborted) return
     aborted = true
-    if (!is.nullOrUndefined(signal)) {
-      signal.removeEventListener('abort', abort)
-    }
+    signal?.removeEventListener('abort', abort)
     controller.abort()
   }
   if (!is.nullOrUndefined(signal)) {
