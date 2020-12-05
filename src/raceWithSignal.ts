@@ -25,7 +25,8 @@ import { composeAbort } from './composeAbort'
  * @param inputSignal Optional inputSignal that will also trigger an abort of all other promises if aborted.
  */
 export async function raceWithSignal <TReturn = unknown> (command: (signal: AbortSignal) => Iterable<Promise<TReturn>>, inputSignal?: AbortSignal): Promise<TReturn> {
-  const { signal, abort } = composeAbort(inputSignal)
+  const controller = composeAbort(inputSignal)
+  const { signal } = controller
   const promises = Array.from(command(signal))
   if (!is.nullOrUndefined(inputSignal)) {
     promises.push(new Promise((resolve, reject) => {
@@ -41,5 +42,5 @@ export async function raceWithSignal <TReturn = unknown> (command: (signal: Abor
       signal.addEventListener('abort', clear)
     }))
   }
-  return await Promise.race(promises).finally(abort)
+  return await Promise.race(promises).finally(controller.abort.bind(controller))
 }
