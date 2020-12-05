@@ -1,6 +1,6 @@
 {
   "name": "@consento/promise",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "description": "Promise utilities used in Consento",
   "main": "dist/index.js",
