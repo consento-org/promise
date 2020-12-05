@@ -51,7 +51,8 @@
   ],
   "dependencies": {
     "@sindresorhus/is": "^4.0.0",
-    "abort-controller": "^3.0.0"
+    "abort-controller": "^3.0.0",
+    "event-target-shim": "^5.0.0"
   },
   "devDependencies": {
     "@leichtgewicht/pack-ts": "^1.0.1",
