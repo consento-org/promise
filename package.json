@@ -2,15 +2,15 @@
   "name": "@consento/promise",
   "version": "1.0.5",
   "private": true,
-  "description": "Promise utilities used in Consento",
-  "main": "dist/index.js",
+  "description": "Helpful utilities to work with AbortController/-Signal.",
+  "main": "index.js",
   "scripts": {
     "ci": "npm run lint && npm run test -- --no-watchman",
     "test": "jest --env=node",
     "build-ts": "tsc",
     "watch-ts": "tsc -w",
     "pack": "pack-ts",
-    "release": "npm run ci && npm run build-ts && npm run pack && cd dist && npm publish --access=public",
+    "release": "npm run ci && npm run pack && cd dist && npm publish --access=public",
     "lint": "eslint --ext .js,.ts ."
   },
   "keywords": [
