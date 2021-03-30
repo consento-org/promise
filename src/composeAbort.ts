@@ -1,4 +1,4 @@
-import { AbortController, AbortSignal } from 'abort-controller'
+import AbortController, { AbortSignal } from 'abort-controller'
 import { AbortError } from './AbortError'
 
 class ComposedAbortController extends AbortController {
