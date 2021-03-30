@@ -1,4 +1,4 @@
-import is from '@sindresorhus/is'
+import { AbortSignal } from 'abort-controller'
 import { TimeoutOptions } from './options'
 import { AbortError } from './AbortError'
 import { wrapTimeout } from './wrapTimeout'
@@ -81,7 +81,7 @@ export async function cleanupPromise <T = unknown> (
         return
       }
       const withCleanup = (cleanup: any): void => {
-        const hasSignal = !is.nullOrUndefined(signal)
+        const hasSignal = signal !== null && signal !== undefined
         // @ts-expect-error 2532 - signal is certainly not undefined with hasSignal
         if (hasSignal && signal.aborted) {
           earlyFinish = earlyFinish ?? { error: new AbortError() }
@@ -92,7 +92,7 @@ export async function cleanupPromise <T = unknown> (
             if ('error' in finish) {
               return reject(finish.error)
             }
-            if (!is.nullOrUndefined(cleanupError)) {
+            if (cleanupError !== null && cleanupError !== undefined) {
               return reject(cleanupError)
             }
             return resolve(finish.result)
@@ -130,7 +130,7 @@ export async function cleanupPromise <T = unknown> (
             if ('error' in finish) {
               return reject(finish.error)
             }
-            if (!is.nullOrUndefined(cleanupError)) {
+            if (cleanupError !== null && cleanupError !== undefined) {
               return reject(cleanupError)
             }
             return resolve(finish.result)

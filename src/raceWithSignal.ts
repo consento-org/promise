@@ -1,4 +1,3 @@
-import is from '@sindresorhus/is'
 import { AbortSignal } from 'abort-controller'
 import { AbortError } from './AbortError'
 import { composeAbort } from './composeAbort'
@@ -28,7 +27,7 @@ export async function raceWithSignal <TReturn = unknown> (command: (signal: Abor
   const controller = composeAbort(inputSignal)
   const { signal } = controller
   const promises = Array.from(command(signal))
-  if (!is.nullOrUndefined(inputSignal)) {
+  if (inputSignal !== null && inputSignal !== undefined) {
     promises.push(new Promise((resolve, reject) => {
       const abortHandler = (): void => {
         clear()

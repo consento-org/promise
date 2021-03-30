@@ -1,6 +1,5 @@
 import { TimeoutOptions } from './options'
 import { AbortSignal } from 'abort-controller'
-import is from '@sindresorhus/is'
 import { bubbleAbort } from './bubbleAbort'
 import { raceWithSignal } from './raceWithSignal'
 
@@ -45,7 +44,7 @@ export type TimeoutCommand <T> = (signal: AbortSignal | undefined, resetTimeout:
  */
 export async function wrapTimeout <T> (command: TimeoutCommand<T>, opts: TimeoutOptions = {}): Promise<T> {
   const { timeout, signal: inputSignal } = opts
-  if (is.nullOrUndefined(timeout) || timeout === 0) {
+  if (timeout === null || timeout === undefined || timeout === 0) {
     bubbleAbort(inputSignal)
     return await command(inputSignal, noop)
   }

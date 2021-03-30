@@ -55,45 +55,4 @@ describe('composeAbort(signal?)', () => {
       composeAbort(parent.signal)
     }).toThrowError(AbortError)
   })
-  it('composing will not add an unnecessary event listener', async () => {
-    const parent = new AbortController()
-    const listeners: { [key in string]: Set<any>} = {}
-    parent.signal.addEventListener = function (...[type, listener]: Parameters<typeof AbortSignal.prototype.addEventListener>) {
-      AbortSignal.prototype.addEventListener.call(this, type, listener)
-      if (listener === null) return
-      let forEvent = listeners[type]
-      if (forEvent === undefined) {
-        forEvent = new Set()
-        listeners[type] = forEvent
-      }
-      forEvent.add(listener)
-    }
-    parent.signal.removeEventListener = function (...[type, listener]: Parameters<typeof AbortSignal.prototype.removeEventListener>) {
-      AbortSignal.prototype.removeEventListener.call(this, type, listener)
-      if (listener === null) return
-      const forEvent = listeners[type]
-      if (forEvent === undefined) return
-      forEvent.delete(listener)
-      if (forEvent.size === 0) {
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete listeners[type]
-      }
-    }
-    const child = composeAbort(parent.signal)
-    expect(child.signal.aborted).toBe(false)
-    expect(listeners).toEqual({})
-    const listener = (): void => {}
-    child.signal.addEventListener('otherEvent', listener)
-    expect(listeners).toEqual({})
-    child.signal.addEventListener('abort', listener)
-    expect(listeners.abort?.size).toEqual(1)
-    child.signal.removeEventListener('abort', listener)
-    expect(listeners).toEqual({})
-    child.signal.addEventListener('abort', listener)
-    expect(listeners.abort?.size).toEqual(1)
-    child.abort()
-    expect(listeners).toEqual({})
-    child.signal.addEventListener('abort', listener)
-    expect(listeners).toEqual({})
-  })
 })

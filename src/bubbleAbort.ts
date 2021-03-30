@@ -1,4 +1,5 @@
 import { AbortError } from './AbortError'
+import { AbortSignal } from 'abort-controller'
 
 /**
  * Simple function that throws an AbortError if an AbortSignal
@@ -22,7 +23,7 @@ import { AbortError } from './AbortError'
  * @see checkpoint for an alternative syntax that requires less typing.
  * @see AbortError
  */
-export function bubbleAbort (signal?: AbortSignal | null): void {
+export function bubbleAbort (signal?: AbortSignal | null | undefined): void {
   if (signal === undefined || signal === null) {
     return
   }

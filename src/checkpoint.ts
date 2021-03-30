@@ -1,4 +1,5 @@
 import { AbortError } from './AbortError'
+import { AbortSignal } from 'abort-controller'
 
 const cache = new WeakMap<AbortSignal, CheckPoint>()
 const passthrough: CheckPoint = <T> (input?: () => T): T | undefined => {
