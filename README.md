@@ -3,6 +3,10 @@
 A set of utilities for working with [Promises]() with particular focus
 on abort-ability using [`AbortSignal`s][AbortSignal].
 
+For more about this library, you can look at an in-depth article in [english](https://qiita.com/martinheidegger/items/3e6355e96e85fc1c841e).
+
+詳しい説明のために[このライブラリについての記事](https://qiita.com/martinheidegger/items/6e8275d2de88174bc7e6)を読んでください。
+
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 [AbortSignal]: https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal
 
